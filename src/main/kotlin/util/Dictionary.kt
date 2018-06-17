@@ -19,10 +19,9 @@ class Dictionary {
     fun isThisAWord(input: String): Boolean {
         try {
             val stmt = connection.createStatement()
-            val resultSet = stmt.executeQuery("select count(*) as result from distinct_words where word = '$input'")
+            val resultSet = stmt.executeQuery("select exists(select 1 from distinct_words where word = '$input' limit 1)")
             resultSet.next()
-            val count = resultSet.getInt("result")
-            return count > 0
+            return resultSet.getBoolean(1)
         } catch (e: SQLException) {
             connection = openNewConnection()
         }
