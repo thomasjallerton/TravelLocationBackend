@@ -4,14 +4,14 @@ import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import org.apache.http.HttpStatus
+import org.slf4j.LoggerFactory
 
 abstract class AbstractLambdaHandler : RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
-    companion object {
-        const val AUTH_HEADER = "Authorization"
-    }
+    protected val logger = LoggerFactory.getLogger(this::class.java)
 
     fun badRequestResponse(e: Exception, message: String = "BAD REQUEST"): APIGatewayProxyResponseEvent {
+        logger.debug(e.message, e)
         return badRequestResponse(message)
     }
 

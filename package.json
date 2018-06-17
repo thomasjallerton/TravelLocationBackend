@@ -1,0 +1,15 @@
+{
+  "name": "smartnumbers-api-service",
+  "description": "",
+  "version": "0.1.0",
+  "dependencies": {},
+  "devDependencies": {
+    "serverless": "^1.26.1",
+  },
+  "scripts": {
+    "deploy-production": "serverless deploy --stage production",
+    "deploy-uat": "serverless deploy --stage uat",
+    "deploy-development": "serverless deploy --stage dev",
+    "deploy-dev-localbuild": "serverless deploy --stage dev --artifact target/smartnumbers-api-service-SHADED.jar"
+  }
+}

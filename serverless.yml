@@ -1,0 +1,40 @@
+service: travel-location
+
+provider:
+  name: aws
+  runtime: java8
+  stage: prod # Set the default stage used. Default is dev
+  region: eu-west-1 # Overwrite the default region used. Default is us-east-1
+  environment:
+    DB_HOST: travel-location.cvghjo0rbr3a.eu-west-1.rds.amazonaws.com
+    DB_PORT: 3306
+    DB_DATABASE: entries
+    DB_USERNAME: root
+
+  vpc:
+    securityGroupIds:
+      - sg-0e4874f424808b2ed
+    subnetIds:
+      - subnet-0065593f10874192d
+      - subnet-082006f7d4040591a
+
+# you can add packaging information here
+package:
+  artifact: ${opt:artifact, "target/TravelLocationBackend-SHADED.jar"}
+
+
+functions:
+  chatMessages:
+      handler: lambdahandlers.FindLocationHandler::handleRequest
+      timeout: 20
+      events:
+        - http:
+            path: v1/findlocation
+            method: post
+            request:
+              parameters:
+                querystrings:
+                  count: false
+
+
+
