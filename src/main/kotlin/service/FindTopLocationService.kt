@@ -23,7 +23,10 @@ class FindTopLocationService: FindTopLocationApi {
             logger.debug("About to execute http request")
             val html = HttpRequest.getHtml(url)
             val paragraphs = Jsoup.parse(html).select("p")
+            val title = Jsoup.parse(html).select("title")
             val properNouns = extractProperNouns(paragraphs.text())
+
+            properNouns.addAll(extractSingleProperNouns(title.text()))
 
             logger.debug("About to sort words")
 
@@ -57,7 +60,7 @@ class FindTopLocationService: FindTopLocationApi {
         }
     }
 
-    private fun extractProperNouns(inputString: String): List<String> {
+    private fun extractProperNouns(inputString: String): MutableList<String> {
         val regex = Regex("([A-Z][a-z]+ ?)+")
         val matches = regex.findAll(inputString)
         val result = LinkedList<String>()
@@ -67,14 +70,19 @@ class FindTopLocationService: FindTopLocationApi {
         return result
     }
 
+    private fun extractSingleProperNouns(inputString: String): List<String> {
+        val regex = Regex("([A-Z][a-z]+ ?)")
+        val matches = regex.findAll(inputString)
+        val result = LinkedList<String>()
+        for (match in matches) {
+            result.add(match.value)
+        }
+        return result
+    }
 
     private fun errorResponse(message: String): Response {
         return Response.serverError().entity("{\n\"message\" : \"$message\"\n}").build()
     }
 
     private class Result(val words: MutableList<WordCounter.WordCount> = LinkedList())
-}
-
-fun main(args: Array<String>) {
-    FindTopLocationService().findTopLocation("https://medium.com/@DavidBindel/a-week-in-shanghai-8af0e95ea230", 3)
 }
