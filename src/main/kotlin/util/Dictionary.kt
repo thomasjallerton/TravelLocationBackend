@@ -23,10 +23,22 @@ class Dictionary {
         return DriverManager.getConnection(url, username, password)
     }
 
-    fun isThisAWord(input: String): Boolean {
+    fun isThisAWordOrName(input: String): Boolean {
         try {
             val stmt = connection!!.createStatement()
-            val resultSet = stmt.executeQuery("select exists(select 1 from distinct_words where word = '$input' limit 1)")
+            val resultSet = stmt.executeQuery("select exists(select 1 from distinct_words where word = '$input' limit 1 union all select 1 from distinct_firstname where firstname = '$input' limit 1)")
+            resultSet.next()
+            return resultSet.getBoolean(1)
+        } catch (e: SQLException) {
+            connection = openNewConnection()
+        }
+        return false
+    }
+
+    fun isThisAFirstName(input: String): Boolean {
+        try {
+            val stmt = connection!!.createStatement()
+            val resultSet = stmt.executeQuery("select exists(select 1 from distinct_firstname where firstname = '$input' limit 1)")
             resultSet.next()
             return resultSet.getBoolean(1)
         } catch (e: SQLException) {

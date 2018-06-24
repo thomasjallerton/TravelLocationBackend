@@ -27,17 +27,22 @@ class FindTopLocationService: FindTopLocationApi {
 
             logger.debug("About to sort words")
 
-            val wordCounts = WordCounter.getOrderedWords(properNouns)
+            val wordCounts = WordCounter.getOrderedWords(properNouns, commonWords)
             val result = Result()
             var numberOfResults = numberOfResultsParam
             for (wordCount in wordCounts) {
-                if (!commonWords.contains(wordCount.word)) {
-                    logger.debug("Executing dictionary lookup")
-                    if (!dictionary.isThisAWord(wordCount.word)) {
+                logger.debug("Executing dictionary lookup")
+                val splitWord = wordCount.word.split(" ")
+                if (splitWord.size == 2) {
+                    if (!dictionary.isThisAFirstName(splitWord[0])) {
                         result.words.add(wordCount)
                         numberOfResults--
                         if (numberOfResults == 0) break
                     }
+                } else if (!dictionary.isThisAWordOrName(wordCount.word)) {
+                    result.words.add(wordCount)
+                    numberOfResults--
+                    if (numberOfResults == 0) break
                 }
             }
             if (result.words.isEmpty()) {

@@ -7,9 +7,12 @@ class WordCounter() {
     var mostFrequent: String = ""
     private var mostFrequentCount: Int = 0
 
-    constructor(words: List<String>): this() {
+    constructor(words: List<String>, ignoreWords: Set<String> = setOf()): this() {
         for (word in words) {
-            add(word.trim())
+            val trimmedWord = word.trim()
+            if (!ignoreWords.contains(trimmedWord)) {
+                add(word.trim())
+            }
         }
     }
 
@@ -42,8 +45,8 @@ class WordCounter() {
     }
 
     companion object {
-        fun getOrderedWords(words: List<String>): List<WordCount> {
-            val wordCounter = WordCounter(words)
+        fun getOrderedWords(words: List<String>, ignoreWords: Set<String> = setOf()): List<WordCount> {
+            val wordCounter = WordCounter(words, ignoreWords)
             return wordCounter.getOrderedWords()
         }
     }

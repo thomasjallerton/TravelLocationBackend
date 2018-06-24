@@ -37,10 +37,10 @@ class FindLocationHandler: AbstractLambdaHandler() {
 fun main(args: Array<String>) {
     val request = APIGatewayProxyRequestEvent()
     val queryStringParams = HashMap<String, String>()
-    queryStringParams["count"] = "3"
+    queryStringParams["count"] = "10"
     request.queryStringParameters = queryStringParams
 
-    val findTopLocationRequest = FindLocationHandler.FindTopLocationRequest("https://medium.com/@DavidBindel/a-week-in-shanghai-8af0e95ea230")
+    val findTopLocationRequest = FindLocationHandler.FindTopLocationRequest("https://medium.com/@ameredetail/on-tuscanys-operatic-magic-aafbdd61356")
     val body = jacksonObjectMapper().writeValueAsString(findTopLocationRequest)
 
     request.body = body
