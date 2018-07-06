@@ -11,17 +11,9 @@ provider:
     DB_DATABASE: entries
     DB_USERNAME: root
 
-  vpc:
-    securityGroupIds:
-      - sg-0e4874f424808b2ed
-    subnetIds:
-      - subnet-0065593f10874192d
-      - subnet-082006f7d4040591a
-
 # you can add packaging information here
 package:
   artifact: ${opt:artifact, "target/TravelLocationBackend-SHADED.jar"}
-
 
 functions:
   chatMessages:
