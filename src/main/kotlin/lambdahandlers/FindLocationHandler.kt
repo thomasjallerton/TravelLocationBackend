@@ -40,11 +40,12 @@ fun main(args: Array<String>) {
     queryStringParams["count"] = "3"
     request.queryStringParameters = queryStringParams
 
-    val findTopLocationRequest = FindLocationHandler.FindTopLocationRequest("https://medium.com/@AlaskaUSFWS/love-of-wild-places-fuels-hunting-guides-life-work-and-art-7ee7e8fa9231?source=topic_page---8------1------------------1")
+    val findTopLocationRequest = FindLocationHandler.FindTopLocationRequest("https://medium.com/@wrenja73/a-little-southern-exposure-c3d80a5526b3?source=topic_page---8------3------------------1")
     val body = jacksonObjectMapper().writeValueAsString(findTopLocationRequest)
 
     request.body = body
 
     val response = FindLocationHandler().handleRequest(request, null)
+
     println(response.body)
 }

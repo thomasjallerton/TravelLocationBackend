@@ -9,10 +9,10 @@ import util.HttpRequest
 import java.util.*
 import javax.ws.rs.core.Response
 
-val commonWords: Set<String> = setOf("In", "And", "He", "She", "It", "Those" ,"The", "No", "Like", "But", "Because", "We",
+val commonWords: Set<String> = setOf("In", "And", "He", "She", "It", "Those", "The", "No", "Like", "But", "Because", "We",
         "You", "Which", "This", "If", "That", "When", "Not", "No", "Well", "What", "His", "Hers", "From")
 
-class FindTopLocationService: FindTopLocationApi {
+class FindTopLocationService : FindTopLocationApi {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -26,28 +26,35 @@ class FindTopLocationService: FindTopLocationApi {
             val title = Jsoup.parse(html).select("title")
             val properNouns = extractProperNouns(paragraphs.text())
 
+
             properNouns.addAll(extractSingleProperNouns(title.text()))
 
             logger.debug("About to sort words")
 
             val wordCounts = WordCounter.getOrderedWords(properNouns, commonWords)
+
             val result = Result()
             var numberOfResults = numberOfResultsParam
             for (wordCount in wordCounts) {
                 logger.debug("Executing dictionary lookup")
                 val splitWord = wordCount.word.split(" ")
                 if (splitWord.size == 2) {
-                    if (!dictionary.isThisAFirstName(splitWord[0])) {
-                        result.words.add(wordCount)
-                        numberOfResults--
-                        if (numberOfResults == 0) break
-                    }
-                } else if (!dictionary.isThisAWordOrName(wordCount.word)) {
+                    dictionary.addName(splitWord[0])
+                } else {
+                    dictionary.addWord(wordCount.word)
+                    dictionary.addName(wordCount.word)
+                }
+            }
+
+            val notLocations = dictionary.findWordsAndNames()
+            for (wordCount in wordCounts) {
+                if (!notLocations.contains(wordCount.word)) {
                     result.words.add(wordCount)
                     numberOfResults--
                     if (numberOfResults == 0) break
                 }
             }
+
             if (result.words.isEmpty()) {
                 errorResponse("No location found")
             } else {

@@ -3,6 +3,8 @@ package util
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
+import java.util.*
+import kotlin.collections.HashSet
 
 private var connection: Connection? = null
 
@@ -14,8 +16,19 @@ class Dictionary {
     private val database = System.getenv()["DB_DATABASE"]
     private val port = System.getenv()["DB_PORT"]
 
+    private val words = LinkedList<String>()
+    private val names = LinkedList<String>()
+
     init {
         connection = openNewConnection()
+    }
+
+    fun addWord(word: String) {
+        words.add(word)
+    }
+
+    fun addName(name: String) {
+        names.add(name)
     }
 
     private fun openNewConnection(): Connection {
@@ -23,28 +36,29 @@ class Dictionary {
         return DriverManager.getConnection(url, username, password)
     }
 
-    fun isThisAWordOrName(input: String): Boolean {
+    fun findWordsAndNames(): Set<String> {
+        val result = HashSet<String>()
         try {
             val stmt = connection!!.createStatement()
-            val resultSet = stmt.executeQuery("select exists(select 1 from distinct_words where word = '$input' limit 1 union all select 1 from distinct_firstname where firstname = '$input' limit 1)")
-            resultSet.next()
-            return resultSet.getBoolean(1)
+            val stringNames = convertToString(names)
+            val stringWords = convertToString(words)
+            val query = "select firstname from distinct_firstname where firstname in ($stringNames) union all select word from distinct_words where word in ($stringWords);"
+            val resultSet = stmt.executeQuery(query)
+            while (resultSet.next()) {
+                val wordOrName = resultSet.getString(1)
+                result.add(wordOrName)
+            }
         } catch (e: SQLException) {
             connection = openNewConnection()
         }
-        return false
+        return result
     }
 
-    fun isThisAFirstName(input: String): Boolean {
-        try {
-            val stmt = connection!!.createStatement()
-            val resultSet = stmt.executeQuery("select exists(select 1 from distinct_firstname where firstname = '$input' limit 1)")
-            resultSet.next()
-            return resultSet.getBoolean(1)
-        } catch (e: SQLException) {
-            connection = openNewConnection()
+    private fun convertToString(list: List<String>): String {
+        var result = ""
+        for (item in list) {
+            result += "'$item',"
         }
-        return false
+        return result.dropLast(1)
     }
-
 }
