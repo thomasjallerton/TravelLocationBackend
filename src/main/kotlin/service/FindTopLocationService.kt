@@ -38,9 +38,13 @@ class FindTopLocationService : FindTopLocationApi {
             for (wordCount in wordCounts) {
                 logger.debug("Executing dictionary lookup")
                 val splitWord = wordCount.word.split(" ")
-                if (splitWord.size == 2) {
-                    dictionary.addName(splitWord[0])
+                if (splitWord.size > 1) {
+                    dictionary.addName(splitWord[0], wordCount.word)
                 } else {
+                    if (wordCount.word.endsWith("s")) {
+                        dictionary.addWord(wordCount.word.dropLast(1), wordCount.word)
+                        dictionary.addName(wordCount.word)
+                    }
                     dictionary.addWord(wordCount.word)
                     dictionary.addName(wordCount.word)
                 }

@@ -19,12 +19,24 @@ class Dictionary {
     private val words = LinkedList<String>()
     private val names = LinkedList<String>()
 
+    private val wordMapping = HashMap<String, String>()
+
     init {
         connection = openNewConnection()
     }
 
     fun addWord(word: String) {
         words.add(word)
+    }
+
+    fun addWord(word: String, mapping: String) {
+        words.add(word)
+        wordMapping[word] = mapping
+    }
+
+    fun addName(name: String, mapping: String) {
+        names.add(name)
+        wordMapping[name] = mapping
     }
 
     fun addName(name: String) {
@@ -46,7 +58,7 @@ class Dictionary {
             val resultSet = stmt.executeQuery(query)
             while (resultSet.next()) {
                 val wordOrName = resultSet.getString(1)
-                result.add(wordOrName)
+                result.add(wordMapping.getOrDefault(wordOrName, wordOrName))
             }
         } catch (e: SQLException) {
             connection = openNewConnection()
